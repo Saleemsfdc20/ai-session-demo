@@ -49,8 +49,8 @@ export function WebToLeadForm() {
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-neutral-300">Preferred Response Channel</label>
-          <select name="00NgK00003n6DzJ" className="w-full border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-salesforce/50 transition-all appearance-none bg-black/50 hover:bg-white/10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundPosition: "right 0.5rem center", backgroundRepeat: "no-repeat", backgroundSize: "1.5em 1.5em", paddingRight: "2.5rem" }}>
-            <option value="" className="bg-neutral-900 text-neutral-500">Select...</option>
+          <select name="00NgK00003n6DzJ" defaultValue="" className="w-full border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-salesforce/50 transition-all appearance-none bg-black/50 hover:bg-white/10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundPosition: "right 0.5rem center", backgroundRepeat: "no-repeat", backgroundSize: "1.5em 1.5em", paddingRight: "2.5rem" }}>
+            <option value="" disabled className="bg-neutral-900 text-neutral-500">Select...</option>
             {channels.map(opt => <option key={opt} value={opt} className="bg-neutral-900">{opt}</option>)}
           </select>
         </div>
@@ -59,15 +59,15 @@ export function WebToLeadForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <label className="text-sm font-medium text-neutral-300">Project Type</label>
-          <select name="00NgK00003n25PJ" className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-salesforce/50 transition-all appearance-none hover:bg-white/10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundPosition: "right 0.5rem center", backgroundRepeat: "no-repeat", backgroundSize: "1.5em 1.5em", paddingRight: "2.5rem" }}>
-            <option value="" className="bg-neutral-900 text-neutral-500">Select...</option>
+          <select name="00NgK00003n25PJ" defaultValue="" className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-salesforce/50 transition-all appearance-none hover:bg-white/10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundPosition: "right 0.5rem center", backgroundRepeat: "no-repeat", backgroundSize: "1.5em 1.5em", paddingRight: "2.5rem" }}>
+            <option value="" disabled className="bg-neutral-900 text-neutral-500">Select...</option>
             {projectTypes.map(opt => <option key={opt} value={opt} className="bg-neutral-900">{opt}</option>)}
           </select>
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-neutral-300">Budget Range</label>
-          <select name="00NgK00003n2jvm" className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-salesforce/50 transition-all appearance-none hover:bg-white/10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundPosition: "right 0.5rem center", backgroundRepeat: "no-repeat", backgroundSize: "1.5em 1.5em", paddingRight: "2.5rem" }}>
-            <option value="" className="bg-neutral-900 text-neutral-500">Select...</option>
+          <select name="00NgK00003n2jvm" defaultValue="" className="w-full bg-black/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-brand-salesforce/50 transition-all appearance-none hover:bg-white/10" style={{ backgroundImage: "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")", backgroundPosition: "right 0.5rem center", backgroundRepeat: "no-repeat", backgroundSize: "1.5em 1.5em", paddingRight: "2.5rem" }}>
+            <option value="" disabled className="bg-neutral-900 text-neutral-500">Select...</option>
             {budgetRanges.map(opt => <option key={opt} value={opt} className="bg-neutral-900">{opt}</option>)}
           </select>
         </div>
