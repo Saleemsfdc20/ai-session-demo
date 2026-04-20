@@ -34,17 +34,25 @@ export function AgentChat() {
     setIsLoading(true);
 
     try {
-      // POST API call to /api/create-lead
-      await fetch('/api/create-lead', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: userMessage.content }),
-      }).catch(() => {}); // Catch if endpoint doesn't exist yet so it doesn't crash demo
+      // Create FormData formatted exactly for Salesforce Web-To-Lead
+      const formData = new FormData();
+      formData.append('oid', '00DgK00000KnrZ7');
+      formData.append('retURL', 'https://ai-session-demo.vercel.app/thank-you');
+      formData.append('first_name', 'Website User');
+      formData.append('last_name', 'Lead');
+      formData.append('email', 'chat@website.com'); // Optional dummy email
+      formData.append('company', 'Website');
+      formData.append('00NgK00003n65or', userMessage.content); // Requirement Details mapping
       
-      // Simulate processing time if API responds too quickly or returns an error immediately
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Submit directly in the background using no-cors mode to bypass CORS
+      await fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData,
+      });
+      
+      // Simulate processing time UX
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       setMessages((prev) => [
         ...prev,
