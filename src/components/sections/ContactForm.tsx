@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Section } from "../ui/Section";
-import { WebToLeadForm } from "./WebToLeadForm";
+import { AgentChat } from "./AgentChat";
 
 export function ContactForm() {
   return (
@@ -17,11 +17,8 @@ export function ContactForm() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 md:p-10 rounded-3xl shadow-2xl relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-salesforce/5 rounded-full blur-[100px] pointer-events-none" />
-
-          <WebToLeadForm />
+          <AgentChat />
         </motion.div>
       </div>
     </Section>
