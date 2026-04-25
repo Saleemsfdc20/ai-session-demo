@@ -10,21 +10,21 @@ type Message = {
   content: string;
 };
 
-type ChatStep = "ASK_CONTACT" | "ASK_REQUIREMENT" | "CONFIRM_SUBMIT" | "SUBMITTED";
+type ChatStep = "ASK_CONTACT" | "ASK_REQUIREMENT" | "CONFIRMATION" | "SUBMITTED";
 
 export function AgentChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "init",
       role: "system",
-      content: "Please share your email or phone so we can reach you."
+      content: "Please share your email or phone"
     }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
   const [step, setStep] = useState<ChatStep>("ASK_CONTACT");
-  const [contactInfo, setContactInfo] = useState("");
+  const [contact, setContact] = useState("");
   const [requirement, setRequirement] = useState("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -48,7 +48,27 @@ export function AgentChat() {
     setInput("");
 
     if (step === "ASK_CONTACT") {
-      setContactInfo(userMessageContent);
+      let isValid = false;
+      if (userMessageContent.includes('@')) {
+        isValid = true;
+      } else if (/\d/.test(userMessageContent)) {
+        isValid = true;
+      }
+
+      if (!isValid) {
+        setIsLoading(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: "system",
+            content: "Please provide a valid email or phone number."
+          }]);
+          setIsLoading(false);
+        }, 600);
+        return;
+      }
+
+      setContact(userMessageContent);
       setStep("ASK_REQUIREMENT");
       
       setIsLoading(true);
@@ -65,32 +85,32 @@ export function AgentChat() {
 
     if (step === "ASK_REQUIREMENT") {
       setRequirement(userMessageContent);
-      setStep("CONFIRM_SUBMIT");
+      setStep("CONFIRMATION");
       
       setIsLoading(true);
       setTimeout(() => {
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: "system",
-          content: `Contact Info: ${contactInfo}\nRequirement: ${userMessageContent}\n\nDo you want to submit this request? (Yes/No)`
+          content: `Contact: ${contact}\nRequirement: ${userMessageContent}\n\nDo you want to submit? (Yes/No)`
         }]);
         setIsLoading(false);
       }, 600);
       return;
     }
 
-    if (step === "CONFIRM_SUBMIT") {
+    if (step === "CONFIRMATION") {
       const lowerInput = userMessageContent.toLowerCase();
       if (lowerInput === "no" || lowerInput === "n") {
         setStep("ASK_CONTACT");
-        setContactInfo("");
+        setContact("");
         setRequirement("");
         setIsLoading(true);
         setTimeout(() => {
           setMessages(prev => [...prev, {
             id: Date.now().toString(),
             role: "system",
-            content: "Let's try again. Please share your email or phone so we can reach you."
+            content: "Please share your email or phone"
           }]);
           setIsLoading(false);
         }, 600);
@@ -98,21 +118,10 @@ export function AgentChat() {
       } else if (lowerInput === "yes" || lowerInput === "y") {
         setIsLoading(true);
         try {
-          const emailMatch = contactInfo.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
-          const phoneMatch = contactInfo.match(/(\+?\d[\d -]{8,12}\d)/);
+          const isEmail = contact.includes('@');
+          const extractedEmail = isEmail ? contact : 'chat@website.com';
+          const extractedPhone = !isEmail ? contact : '';
           const isUrgent = requirement.toLowerCase().includes('urgent');
-          
-          let firstName = 'Website User';
-          let lastName = 'Lead';
-          
-          const nameMatch = contactInfo.match(/(?:my name is|i am|i'm) ([a-z]+)(?: ([a-z]+))?/i);
-          if (nameMatch) {
-            firstName = nameMatch[1];
-            if (nameMatch[2]) lastName = nameMatch[2];
-          }
-
-          const extractedEmail = emailMatch ? emailMatch[0] : (contactInfo.includes('@') ? contactInfo : 'chat@website.com');
-          const extractedPhone = phoneMatch ? phoneMatch[0] : (contactInfo.includes('@') ? '' : contactInfo);
 
           const form = document.createElement('form');
           form.method = 'POST';
@@ -122,8 +131,8 @@ export function AgentChat() {
           const fields: Record<string, string> = {
             'oid': '00DgK00000KnrZ7',
             'retURL': 'https://ai-session-demo.vercel.app/thank-you',
-            'first_name': firstName,
-            'last_name': lastName,
+            'first_name': 'Website User',
+            'last_name': 'Lead',
             'company': 'Website',
             'email': extractedEmail,
             'phone': extractedPhone,
@@ -170,7 +179,7 @@ export function AgentChat() {
           setMessages(prev => [...prev, {
             id: Date.now().toString(),
             role: "system",
-            content: "Please reply with 'Yes' to submit or 'No' to edit."
+            content: "Do you want to submit? (Yes/No)"
           }]);
           setIsLoading(false);
         }, 600);
