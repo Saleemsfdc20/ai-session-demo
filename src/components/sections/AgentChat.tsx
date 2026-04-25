@@ -10,10 +10,23 @@ type Message = {
   content: string;
 };
 
+type ChatStep = "ASK_CONTACT" | "ASK_REQUIREMENT" | "CONFIRM_SUBMIT" | "SUBMITTED";
+
 export function AgentChat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "init",
+      role: "system",
+      content: "Please share your email or phone so we can reach you."
+    }
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
+  const [step, setStep] = useState<ChatStep>("ASK_CONTACT");
+  const [contactInfo, setContactInfo] = useState("");
+  const [requirement, setRequirement] = useState("");
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -26,78 +39,143 @@ export function AgentChat() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || step === "SUBMITTED") return;
 
-    const userMessage: Message = { id: Date.now().toString(), role: "user", content: input.trim() };
+    const userMessageContent = input.trim();
+    const userMessage: Message = { id: Date.now().toString(), role: "user", content: userMessageContent };
+    
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setIsLoading(true);
 
-    try {
-      // Basic extraction
-      const emailMatch = userMessage.content.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
-      const phoneMatch = userMessage.content.match(/(\+?\d[\d -]{8,12}\d)/);
-      const isUrgent = userMessage.content.toLowerCase().includes('urgent');
+    if (step === "ASK_CONTACT") {
+      setContactInfo(userMessageContent);
+      setStep("ASK_REQUIREMENT");
       
-      let firstName = 'Website User';
-      let lastName = 'Lead';
-      
-      // Simplistic name extraction if message contains "my name is", "i am", "i'm"
-      const nameMatch = userMessage.content.match(/(?:my name is|i am|i'm) ([a-z]+)(?: ([a-z]+))?/i);
-      if (nameMatch) {
-        firstName = nameMatch[1];
-        if (nameMatch[2]) lastName = nameMatch[2];
-      }
-
-      const extractedEmail = emailMatch ? emailMatch[0] : 'chat@website.com';
-      const extractedPhone = phoneMatch ? phoneMatch[0] : '';
-
-      // Create hidden form dynamically
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
-      form.style.display = 'none';
-
-      // Map the required fields
-      const fields: Record<string, string> = {
-        'oid': '00DgK00000KnrZ7',
-        'retURL': 'https://ai-session-demo.vercel.app/thank-you',
-        'first_name': firstName,
-        'last_name': lastName,
-        'company': 'Website',
-        'email': extractedEmail,
-        'phone': extractedPhone,
-        '00NgK00003n25PJ': 'AI / Agentforce', // Project Type
-        '00NgK00003n2jvm': 'Not Sure', // Budget Range
-        '00NgK00003n48m2': isUrgent ? '1' : '0', // Urgent Request
-        '00NgK00003n65or': userMessage.content // Requirement Details
-      };
-
-      for (const [key, value] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
-      }
-
-      document.body.appendChild(form);
-      form.submit();
-      
-      // Form submission navigates away, but clear loading state after a delay as fallback
-      setTimeout(() => setIsLoading(false), 2000);
-      return;
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
+      setIsLoading(true);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
           role: "system",
-          content: "Something went wrong. Please try again later.",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
+          content: "How can we help you?"
+        }]);
+        setIsLoading(false);
+      }, 600);
+      return;
+    }
+
+    if (step === "ASK_REQUIREMENT") {
+      setRequirement(userMessageContent);
+      setStep("CONFIRM_SUBMIT");
+      
+      setIsLoading(true);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: "system",
+          content: `Contact Info: ${contactInfo}\nRequirement: ${userMessageContent}\n\nDo you want to submit this request? (Yes/No)`
+        }]);
+        setIsLoading(false);
+      }, 600);
+      return;
+    }
+
+    if (step === "CONFIRM_SUBMIT") {
+      const lowerInput = userMessageContent.toLowerCase();
+      if (lowerInput === "no" || lowerInput === "n") {
+        setStep("ASK_CONTACT");
+        setContactInfo("");
+        setRequirement("");
+        setIsLoading(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: "system",
+            content: "Let's try again. Please share your email or phone so we can reach you."
+          }]);
+          setIsLoading(false);
+        }, 600);
+        return;
+      } else if (lowerInput === "yes" || lowerInput === "y") {
+        setIsLoading(true);
+        try {
+          const emailMatch = contactInfo.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+          const phoneMatch = contactInfo.match(/(\+?\d[\d -]{8,12}\d)/);
+          const isUrgent = requirement.toLowerCase().includes('urgent');
+          
+          let firstName = 'Website User';
+          let lastName = 'Lead';
+          
+          const nameMatch = contactInfo.match(/(?:my name is|i am|i'm) ([a-z]+)(?: ([a-z]+))?/i);
+          if (nameMatch) {
+            firstName = nameMatch[1];
+            if (nameMatch[2]) lastName = nameMatch[2];
+          }
+
+          const extractedEmail = emailMatch ? emailMatch[0] : (contactInfo.includes('@') ? contactInfo : 'chat@website.com');
+          const extractedPhone = phoneMatch ? phoneMatch[0] : (contactInfo.includes('@') ? '' : contactInfo);
+
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
+          form.style.display = 'none';
+
+          const fields: Record<string, string> = {
+            'oid': '00DgK00000KnrZ7',
+            'retURL': 'https://ai-session-demo.vercel.app/thank-you',
+            'first_name': firstName,
+            'last_name': lastName,
+            'company': 'Website',
+            'email': extractedEmail,
+            'phone': extractedPhone,
+            '00NgK00003n25PJ': 'AI / Agentforce',
+            '00NgK00003n2jvm': 'Not Sure',
+            '00NgK00003n48m2': isUrgent ? '1' : '0',
+            '00NgK00003n65or': requirement
+          };
+
+          for (const [key, value] of Object.entries(fields)) {
+            const inputField = document.createElement('input');
+            inputField.type = 'hidden';
+            inputField.name = key;
+            inputField.value = value;
+            form.appendChild(inputField);
+          }
+
+          document.body.appendChild(form);
+          form.submit();
+          
+          setStep("SUBMITTED");
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: "system",
+            content: "Your request has been submitted. Our team will contact you soon 🚀"
+          }]);
+
+          setTimeout(() => setIsLoading(false), 2000);
+          return;
+        } catch {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: (Date.now() + 1).toString(),
+              role: "system",
+              content: "Something went wrong. Please try again later.",
+            },
+          ]);
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(true);
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            role: "system",
+            content: "Please reply with 'Yes' to submit or 'No' to edit."
+          }]);
+          setIsLoading(false);
+        }, 600);
+        return;
+      }
     }
   };
 
@@ -183,13 +261,14 @@ export function AgentChat() {
                 }
               }}
               placeholder="Describe your requirement..."
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 md:py-4 text-white placeholder:text-neutral-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 resize-none min-h-[50px] md:min-h-[56px] max-h-[150px] block transition-all shadow-inner"
+              disabled={step === "SUBMITTED"}
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 md:py-4 text-white placeholder:text-neutral-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 resize-none min-h-[50px] md:min-h-[56px] max-h-[150px] block transition-all shadow-inner disabled:opacity-50 disabled:cursor-not-allowed"
               rows={1}
             />
           </div>
           <button
             type="submit"
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isLoading || step === "SUBMITTED"}
             className="h-[50px] md:h-[56px] px-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/25 active:scale-95 flex-shrink-0"
           >
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 ml-1" />}
