@@ -3,8 +3,6 @@
 import { motion } from "framer-motion";
 import { Section } from "../ui/Section";
 import { Card } from "../ui/Card";
-import { ExternalLink } from "lucide-react";
-import Image from "next/image";
 
 const projects = [
   {

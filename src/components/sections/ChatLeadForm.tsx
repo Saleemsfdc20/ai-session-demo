@@ -54,7 +54,7 @@ export function ChatLeadForm() {
           content: "Got it! Your requirement has been captured. I'll get back to you soon.",
         },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
@@ -79,7 +79,7 @@ export function ChatLeadForm() {
           Project Assistant
         </h3>
         <p className="text-sm md:text-base text-neutral-400 mt-1">
-          Tell me your requirement, and we'll get started right away.
+          Tell me your requirement, and we&apos;ll get started right away.
         </p>
       </div>
 

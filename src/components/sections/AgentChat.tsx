@@ -34,35 +34,60 @@ export function AgentChat() {
     setIsLoading(true);
 
     try {
-      // Create FormData formatted exactly for Salesforce Web-To-Lead
-      const formData = new FormData();
-      formData.append('oid', '00DgK00000KnrZ7');
-      formData.append('retURL', 'https://ai-session-demo.vercel.app/thank-you');
-      formData.append('first_name', 'Website User');
-      formData.append('last_name', 'Lead');
-      formData.append('email', 'chat@website.com'); // Optional dummy email
-      formData.append('company', 'Website');
-      formData.append('00NgK00003n65or', userMessage.content); // Requirement Details mapping
+      // Basic extraction
+      const emailMatch = userMessage.content.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/);
+      const phoneMatch = userMessage.content.match(/(\+?\d[\d -]{8,12}\d)/);
+      const isUrgent = userMessage.content.toLowerCase().includes('urgent');
       
-      // Submit directly in the background using no-cors mode to bypass CORS
-      await fetch('https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8', {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData,
-      });
+      let firstName = 'Website User';
+      let lastName = 'Lead';
       
-      // Simulate processing time UX
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Simplistic name extraction if message contains "my name is", "i am", "i'm"
+      const nameMatch = userMessage.content.match(/(?:my name is|i am|i'm) ([a-z]+)(?: ([a-z]+))?/i);
+      if (nameMatch) {
+        firstName = nameMatch[1];
+        if (nameMatch[2]) lastName = nameMatch[2];
+      }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          role: "system",
-          content: "Got it! Your requirement has been captured and processed. I'll get back to you soon 🚀",
-        },
-      ]);
-    } catch (error) {
+      const extractedEmail = emailMatch ? emailMatch[0] : 'chat@website.com';
+      const extractedPhone = phoneMatch ? phoneMatch[0] : '';
+
+      // Create hidden form dynamically
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8';
+      form.style.display = 'none';
+
+      // Map the required fields
+      const fields: Record<string, string> = {
+        'oid': '00DgK00000KnrZ7',
+        'retURL': 'https://ai-session-demo.vercel.app/thank-you',
+        'first_name': firstName,
+        'last_name': lastName,
+        'company': 'Website',
+        'email': extractedEmail,
+        'phone': extractedPhone,
+        '00NgK00003n25PJ': 'AI / Agentforce', // Project Type
+        '00NgK00003n2jvm': 'Not Sure', // Budget Range
+        '00NgK00003n48m2': isUrgent ? '1' : '0', // Urgent Request
+        '00NgK00003n65or': userMessage.content // Requirement Details
+      };
+
+      for (const [key, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      
+      // Form submission navigates away, but clear loading state after a delay as fallback
+      setTimeout(() => setIsLoading(false), 2000);
+      return;
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
@@ -87,7 +112,7 @@ export function AgentChat() {
           Project Assistant
         </h3>
         <p className="text-sm md:text-base text-neutral-400 mt-1">
-          Let's discuss how we can help.
+          Let&apos;s discuss how we can help.
         </p>
       </div>
 

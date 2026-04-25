@@ -22,7 +22,7 @@ export function Innovation() {
         </motion.div>
         <h2 className="text-3xl md:text-5xl font-bold mb-6">AI & Innovation</h2>
         <p className="text-neutral-400 text-lg max-w-2xl mx-auto">
-          Passionate about the intersection of AI and Salesforce. Constantly exploring Agentforce, vibe coding, and prototype generation to bring tomorrow's capabilities to today's cloud.
+          Passionate about the intersection of AI and Salesforce. Constantly exploring Agentforce, vibe coding, and prototype generation to bring tomorrow&apos;s capabilities to today&apos;s cloud.
         </p>
       </div>
 
