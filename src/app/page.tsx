@@ -6,7 +6,7 @@ import { Expertise } from "@/components/sections/Expertise";
 import { Projects } from "@/components/sections/Projects";
 import { Community } from "@/components/sections/Community";
 import { Innovation } from "@/components/sections/Innovation";
-import { ContactForm } from "@/components/sections/ContactForm";
+
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
@@ -21,7 +21,6 @@ export default function Home() {
       <Projects />
       <Community />
       <Innovation />
-      <ContactForm />
       
       <Footer />
     </main>

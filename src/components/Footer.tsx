@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Cloud, Mail } from "lucide-react";
 import { FaLinkedin, FaTwitter, FaGithub } from "react-icons/fa";
+import { openSalesforceChat } from "@/lib/utils";
 
 export function Footer() {
   return (
@@ -45,7 +48,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li><Link href="#expertise" className="text-neutral-400 hover:text-white transition-colors">About Me</Link></li>
               <li><Link href="#projects" className="text-neutral-400 hover:text-white transition-colors">Projects</Link></li>
-              <li><Link href="#contact" className="text-neutral-400 hover:text-white transition-colors">Contact</Link></li>
+              <li><button onClick={openSalesforceChat} className="text-neutral-400 hover:text-white transition-colors">Contact</button></li>
               <li><a href="mailto:hello@saleem.cloud" className="text-neutral-400 hover:text-white transition-colors flex items-center gap-2"><Mail className="w-4 h-4"/> Email Me</a></li>
             </ul>
           </div>

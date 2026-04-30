@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, Cloud } from "lucide-react";
 import { Button } from "./ui/Button";
-import { cn } from "@/lib/utils";
+import { cn, openSalesforceChat } from "@/lib/utils";
 
 const navLinks = [
   { href: "#services", label: "Services" },
@@ -51,8 +51,8 @@ export function Navigation() {
               {link.label}
             </Link>
           ))}
-          <Button variant="primary" asChild>
-            <Link href="#contact">Start a Project</Link>
+          <Button variant="primary" onClick={openSalesforceChat}>
+            Start a Project
           </Button>
         </nav>
 
@@ -78,8 +78,8 @@ export function Navigation() {
               {link.label}
             </Link>
           ))}
-          <Button variant="primary" className="mt-4 w-full" asChild onClick={() => setIsMenuOpen(false)}>
-            <Link href="#contact">Start a Project</Link>
+          <Button variant="primary" className="mt-4 w-full" onClick={() => { setIsMenuOpen(false); openSalesforceChat(); }}>
+            Start a Project
           </Button>
         </div>
       )}

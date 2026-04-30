@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import { Section } from "../ui/Section";
 import Link from "next/link";
 import { ArrowRight, CloudLightning } from "lucide-react";
+import { openSalesforceChat } from "@/lib/utils";
 
 export function Hero() {
   return (
@@ -49,10 +50,8 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Button variant="primary" size="lg" className="w-full sm:w-auto" asChild>
-            <Link href="#contact">
-              Start Your Project <ArrowRight className="ml-2 w-4 h-4" />
-            </Link>
+          <Button variant="primary" size="lg" className="w-full sm:w-auto" onClick={openSalesforceChat}>
+            Start Your Project <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
           <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
             <Link href="#services">Explore Services</Link>
