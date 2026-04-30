@@ -2,6 +2,18 @@
 
 import { useEffect } from "react";
 
+interface EmbeddedServiceBootstrap {
+  settings: {
+    language: string;
+  };
+  init: (
+    orgId: string,
+    deploymentName: string,
+    baseCoreUrl: string,
+    options: { scrt2URL: string }
+  ) => void;
+}
+
 export function SalesforceChat() {
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -17,7 +29,9 @@ export function SalesforceChat() {
 
     script.onload = () => {
       try {
-        const win = window as any;
+        const win = window as Window & typeof globalThis & {
+          embeddedservice_bootstrap?: EmbeddedServiceBootstrap;
+        };
         if (win.embeddedservice_bootstrap) {
           win.embeddedservice_bootstrap.settings.language = "en_US";
           win.embeddedservice_bootstrap.init(
